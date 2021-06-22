@@ -15,14 +15,16 @@ async function bookResolverDebug(page,browser,bookTitle){
 
 async function processChapterLinks(browser, chapters, bookTitle) {
     const chapterPage = await browser.newPage()
+    let index = 0
     for (let chapter of chapters) {
-        const [chapterTitle, chapterLink] = chapter
+        const [chapterTitle, chapterLink,chapterName] = chapter
         await chapterPage.goto(chapterLink, {
             // waitUntil: 'networkidle0'
         })
         const content = await chapterPage.content()
-        console.log(`正在处理:${bookTitle} ${chapterTitle}`)
-        await htmlOutput.writeContent(bookTitle, chapterTitle, content)
+        const chapterText = `${++index}${chapterName?'-'+chapterName:''}-${chapterTitle}`
+        console.log(`正在处理:${bookTitle} ${chapterText}`)
+        await htmlOutput.writeContent(bookTitle, chapterText, content)
     }
 
     return await chapterPage.close()
@@ -41,12 +43,16 @@ async function bookResolver(page,browser,bookTitle){
     const hasTwoLevelLink = pageContent.indexOf('阅读全文请点击以下专辑链接') !== -1
 
     const chapters = await page.$$eval("#js_content a", (links) => {
-        return links.filter(link => link.text.trim()).map(link => [link.text,link.href])
+        return links.filter(link => link.text.trim()).map(link => {
+            const nextNode = link.parentNode.nextSibling
+            const chapterName = nextNode?nextNode.innerText || '':''
+            return [link.text,link.href,chapterName.trim()]
+        })
     })
 
     // 是话题
     if(topicFlag){
-        console.log('##处理话题章节列表')
+        console.log('\n\n##处理话题章节列表')
         // 这是一个列表页，需要滚动分页
         let chapters = await page.$$eval("li.album__list-item.js_album_item", (links) => {
             return links.map(link => [link.dataset.title,link.dataset.link])
@@ -55,10 +61,10 @@ async function bookResolver(page,browser,bookTitle){
 
         //滚动到页面最底端，以获取所有链接
         do{
-            console.log('滚动鼠标到页面底端，延时5s')
+            console.log('滚动鼠标到页面底端，延时3s')
             chaptersCount = chapters.length
             await page.mouse.wheel({deltaY:5000})
-            await page.waitForTimeout(5000)
+            await page.waitForTimeout(3000)
             chapters = await page.$$eval("li.album__list-item.js_album_item", (links) => {
                 return links.map(link => [link.dataset.title,link.dataset.link])
             })
@@ -67,7 +73,7 @@ async function bookResolver(page,browser,bookTitle){
         return await processChapterLinks(browser, chapters, bookTitle);
 
     }else if(hasTwoLevelLink){
-        console.log('##处理二级书目介绍页')
+        console.log('\n\n##处理二级书目介绍页')
         // 是二级介绍页 这个时候把介绍页也搞下来
         const [bookTitle, bookLink] = chapters[0]
         const bookPage = await browser.newPage()
@@ -77,7 +83,7 @@ async function bookResolver(page,browser,bookTitle){
         return await bookResolver(bookPage, browser, bookTitle)
     }else{
         //是连载的章节页面
-        console.log("##处理连载章节列表")
+        console.log("\n\n##处理连载章节列表")
         return await processChapterLinks(browser, chapters, bookTitle);
     }
 }

@@ -24,7 +24,7 @@ async function booksResolver(page,browser){
         await bookPage.goto(bookLink,{
             // waitUntil: 'networkidle0'
         })
-        console.log('开始下载:',bookTitle)
+        console.log('\n\n开始下载:',bookTitle)
         await bookResolver(bookPage,browser,bookTitle)
     }
 
