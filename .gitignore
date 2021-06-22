@@ -1,5 +1,6 @@
 .idea
 data
+data-*
 
 .DS_Store
 # Logs

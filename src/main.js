@@ -14,4 +14,6 @@ const startUrl = 'https://mp.weixin.qq.com/s/1kt9PVoonTsS2vmY9rWLxQ'
 
     await wxBooks(page,browser)
 
+    await page.close()
+    await browser.close()
 })();

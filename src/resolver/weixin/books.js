@@ -15,7 +15,7 @@ async function booksResolverDebug(page,browser){
 async function booksResolver(page,browser){
 
     const books = await page.$$eval("#js_content a", (links) => {
-        return links.map(link => [link.text,link.href])
+        return links.filter(link => link.text.trim()).map(link => [link.text,link.href])
     })
     const bookPage = await browser.newPage()
 
@@ -24,6 +24,7 @@ async function booksResolver(page,browser){
         await bookPage.goto(bookLink,{
             // waitUntil: 'networkidle0'
         })
+        console.log('开始下载:',bookTitle)
         await bookResolver(bookPage,browser,bookTitle)
     }
 

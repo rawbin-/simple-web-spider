@@ -1,8 +1,8 @@
 const htmlOutput = require('../../output/file/html')
 
 async function bookResolverDebug(page,browser,bookTitle){
-    const [chapterTitle,chapterLink] = await page.$eval("#js_content a", (links) => {
-        return links.map(link => [link.text,link.href])
+    const [chapterTitle,chapterLink] = await page.$eval("#js_content a", (link) => {
+        return [link.text,link.href]
     })
     const chapterPage = await browser.newPage()
     await chapterPage.goto(chapterLink,{
@@ -15,7 +15,7 @@ async function bookResolverDebug(page,browser,bookTitle){
 async function bookResolver(page,browser,bookTitle){
 
     const chapters = await page.$$eval("#js_content a", (links) => {
-        return links.map(link => [link.text,link.href])
+        return links.filter(link => link.text.trim()).map(link => [link.text,link.href])
     })
     const chapterPage = await browser.newPage()
 
@@ -25,6 +25,7 @@ async function bookResolver(page,browser,bookTitle){
             // waitUntil: 'networkidle0'
         })
         const content = await chapterPage.content()
+        console.log(`正在处理:${bookTitle} ${chapterTitle}`)
         await htmlOutput.writeContent(bookTitle,chapterTitle,content)
     }
 
