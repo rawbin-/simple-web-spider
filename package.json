@@ -1,0 +1,24 @@
+{
+  "name": "simple-web-spider",
+  "version": "1.0.0",
+  "description": "微信公众号看到了一些书的连载，章节太多，不适合手动拷贝，于是准备搞个简单工具来弄一下 网上找了些工具，要么就是不（太）会（垃）用（垃），要么就是要收费或者限制数量",
+  "main": "index.js",
+  "dependencies": {
+    "fs-extra": "^10.0.0",
+    "puppeteer": "^10.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rawbin-/simple-web-spider.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rawbin-/simple-web-spider/issues"
+  },
+  "homepage": "https://github.com/rawbin-/simple-web-spider#readme"
+}
